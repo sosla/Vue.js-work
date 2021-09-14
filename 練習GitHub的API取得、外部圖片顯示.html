@@ -39,7 +39,7 @@ Released under the MIT license: http://jsbin.mit-license.org
             </li>
           </ul>
     </div>
-<script id="jsbin-javascript">
+<script>
 var VueURL = 'https://api.github.com/repos/vuejs/vue/commits?per_page=3&sha='
 var soslaURL = 'https://api.github.com/users/sosla/repos?per_page=5&sha='
 
@@ -54,19 +54,18 @@ var app = new Vue({
     sosla_commit : null
   },
   created : function(){
-//       this.getVueApi()
+      this.getVueApi()
       this.getSoslaApi()
   },
   methods : {
     getVueApi : function(){
-//       var xhr = new XMLHttpRequest()
-//       var self = this
-//       xhr.open('GET',VueURL + self.Vue_branch)
-//       xhr.onload = function(){
-//         self.Vue_commit  = JSON.parse(xhr.responseText)
-//         console.log(self.commit[0].html_url)
-//       }
-//       xhr.send()
+      var xhr = new XMLHttpRequest()
+      var self = this
+      xhr.open('GET',VueURL + self.Vue_branch)
+      xhr.onload = function(){
+        self.Vue_commit  = JSON.parse(xhr.responseText)
+      }
+      xhr.send()
     },
     getSoslaApi : function(){
       var xhr = new XMLHttpRequest()
@@ -74,7 +73,6 @@ var app = new Vue({
       xhr.open('GET',soslaURL)
       xhr.onload = function(){
         self.sosla_commit = JSON.parse(xhr.responseText)
-        console.log(self)
       }
       xhr.send()
     }

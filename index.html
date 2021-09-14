@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>學習紀錄</title>
+        
+    </head>
+    <body>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+        <div id="app">
+            <div>
+                <img v-bind:src="image" v-bind:title="message">
+            </div>
+            <select v-model="user_select" name="請選擇">
+                <option value="0">請選擇</option>
+                <option value="1">匯率換算練習</option>
+                <option value="2">BMI計算機</option>
+                <option value="3">數字計算</option>
+                <option value="4">GitHub API</option>
+            </select>
+
+            <div v-if="user_select == 1">
+                <h2>{{input_message}}</h2>
+                <input type="text" v-model="user_input" placeholder="請輸入金額"><br><br>
+                <hr>
+                <label>日幣</label> <input type="text" name="" v-model="jpy"><br>
+                <label>港幣</label> <input type="text" name="" v-model="hkd"><br>
+                <label>美金</label> <input type="text" name="" v-model="usd"><hr>
+                <ul>
+                    <li>日幣:{{jpy_cal}}</li>
+                    <li>港幣:{{hkd_cal}}</li>
+                    <li>美金:{{usd_cal}}</li>
+                </ul>
+            </div>
+
+            <div v-else-if="user_select == 2">
+                BMI計算機<br>
+                身高: <input type="text" name="" v-model="t"><br>
+                體重: <input type="text" name="" v-model="w"><br>
+                BMI: {{vw}}
+            </div>
+
+            <div v-else-if="user_select == 3">
+                計算機<br>
+                <label>A值: {{user_click}}</label><br>
+                <label>B值: {{user_click2}}</label><br>
+                <label>運算符號: {{user_oper}}</label><br>
+                <label v-show="show">結果 = {{user_total}}</label>
+                <table>
+                    <tr>
+                        <td>
+                            <ul>
+                                <li v-for="num in btns" v-on:click="postNum(num)">{{num}}</li>
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                                <li v-for="num in btns" v-on:click="postNum2(num)">{{num}}</li>
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                                <li v-for="sign in oper_sign" v-on:click="postSign(sign)">{{sign}}</li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+                <button v-on:click="goCheck()">結果</button>
+            </div>
+
+            <div v-else-if="user_select == 4">
+                <h2>學習抓GitHub的更新資料 for API</h2>
+                <h3>取得Vue的master最新更新紀錄</h3>
+                <ul>
+                    <li v-for="commit in Vue_commit">
+                        <a v-bind:href="commit.html_url" target="_blank" class="commit">更新紀錄</a>
+                        by
+                        <span><a v-bind:href="commit.author.html_url">{{commit.commit.author.name}}</a></span>
+                        at 
+                        <span>{{commit.commit.author.date}}</span>
+                    </li>
+                </ul>        
+                <h3>取得Sosla的git最新資料</h3>
+                <ul>
+                    <li v-for="commit in sosla_commit">
+                        <div>專案名稱 : {{commit.name}} </div>
+                        <div>建立日期 : {{commit.created_at}} </div>
+                        <div>更新日期 : {{commit.updated_at}} </div>
+                        <div>GitHub連結 : <a v-bind:href="commit.html_url" target="_blank" class="commit">連結</a></div>
+                    </li>
+                </ul>
+            </div>
+
+            <div v-else="user_select">
+                <span>尚未選擇</sapn>
+            </div>
+        </div>
+        <script>
+            var VueURL = 'https://api.github.com/repos/vuejs/vue/commits?per_page=3&sha='
+            var soslaURL = 'https://api.github.com/users/sosla/repos?per_page=5&sha='
+
+            var app = new Vue({
+                el : '#app',
+                data : {
+                    image : 'https://p2.bahamut.com.tw/B/GUILD/c/0/0000005030.JPG',
+                    message : 'New Game',
+                    Vue_branch : 'dev',
+                    Vue_commit : null,
+                    sosla_branch : 'master',
+                    sosla_commit : null,
+                    input_message : "請輸入想要兌換的金額",
+                    user_input:0,
+                    jpy:0.2422,
+                    hkd:3.403,
+                    usd:27.285,
+                    t:0,
+                    w:0,
+                    btns:[0,1,2,3,4,5,6,7,8,9],
+                    oper_sign: ['+','-','*','/'],
+                    user_click : '',
+                    user_click2 : '',
+                    oper : '',
+                    user_oper : '',
+                    show : false,
+                    user_total : 0,
+                    user_select : 0
+                },
+                computed : {
+                    jpy_cal : function(){
+                        return this.user_input / this.jpy
+                    },
+                    hkd_cal : function(){
+                        return this.user_input / this.hkd
+                    },
+                    usd_cal : function(){
+                        return this.user_input / this.usd
+                    },
+                    vw : function(){
+                        if(this.w==0 || this.t==0){
+                            return 0
+                        }else{
+                            return this.w / ((this.t / 100)*(this.t / 100))
+                        }
+                    }
+                },
+                created : function(){
+                    this.getVueApi()
+                    this.getSoslaApi()
+                },
+                methods : {
+                    getVueApi : function(){
+                        var xhr = new XMLHttpRequest()
+                        var self = this
+                        xhr.open('GET',VueURL + self.Vue_branch)
+                        xhr.onload = function(){
+                            self.Vue_commit  = JSON.parse(xhr.responseText)
+                        }
+                        xhr.send()
+                    },
+                    getSoslaApi : function(){
+                        var xhr = new XMLHttpRequest()
+                        var self = this
+                        xhr.open('GET',soslaURL)
+                        xhr.onload = function(){
+                            self.sosla_commit = JSON.parse(xhr.responseText)
+                        }
+                        xhr.send()
+                    },
+                    postNum : function(num){
+                        this.user_click += num
+                    },
+                    postNum2 : function(num){
+                        this.user_click2 += num
+                    },
+                    postSign : function(sign){
+                        this.user_oper = sign
+                    },
+                    goCheck : function(){
+                        this.show = true
+                        switch(this.user_oper){
+                            case '+':
+                                this.user_total = this.user_click + this.user_click2
+                                break;
+                            case '-':
+                                this.user_total = this.user_click - this.user_click2
+                                break;
+                            case '*':
+                                this.user_total = this.user_click * this.user_click2
+                                break;
+                            case '/':
+                                this.user_total = this.user_click / this.user_click2
+                                break;  
+                        }
+                    }
+                }
+            });
+        </script>
+    </body>
+</html>

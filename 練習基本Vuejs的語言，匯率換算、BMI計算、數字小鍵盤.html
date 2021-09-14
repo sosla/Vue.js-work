@@ -16,7 +16,7 @@ Released under the MIT license: http://jsbin.mit-license.org
 <body>
   <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
   <div id="app">
-    <select v-model="user_select">
+    <select v-model="user_select" name="請選擇">
       <option value="0">請選擇</option>
       <option value="1">匯率換算練習</option>
       <option value="2">BMI計算機</option>
@@ -90,7 +90,8 @@ var app = new Vue({
     oper : '',
     user_oper : '',
     show : false,
-    user_total : 0
+    user_total : 0,
+    user_select : 0
   },
   computed : {
     jpy_cal : function(){
@@ -103,7 +104,11 @@ var app = new Vue({
       return this.user_input / this.usd
     },
     vw : function(){
-      return this.w / ((this.t / 100)*(this.t / 100))
+      if(this.w==0 || this.t==0){
+        return 0
+      }else{
+        return this.w / ((this.t / 100)*(this.t / 100))
+      }
     }
   },
   methods:{
