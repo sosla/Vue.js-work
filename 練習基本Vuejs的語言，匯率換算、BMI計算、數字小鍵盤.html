@@ -1,0 +1,143 @@
+<!--
+Created using JS Bin
+http://jsbin.com
+
+Copyright (c) 2021 by anonymous (http://jsbin.com/tipahoqumu/1/edit)
+
+Released under the MIT license: http://jsbin.mit-license.org
+-->
+<meta name="robots" content="noindex">
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>JS Bin</title>
+</head>
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <div id="app">
+    <select v-model="user_select">
+      <option value="0">請選擇</option>
+      <option value="1">匯率換算練習</option>
+      <option value="2">BMI計算機</option>
+      <option value="3">數字計算</option>
+    </select>
+    <div v-if="user_select == 1">
+      <h2>{{message}}</h2>
+      <input type="text" v-model="user_input"><br><br>
+      <hr>
+      <label>日幣</label> <input type="text" name="" v-model="jpy"><br>
+      <label>港幣</label> <input type="text" name="" v-model="hkd"><br>
+      <label>美金</label> <input type="text" name="" v-model="usd"><hr>
+      <ul>
+        <li>日幣:{{jpy_cal}}</li>
+        <li>港幣:{{hkd_cal}}</li>
+        <li>美金:{{usd_cal}}</li>
+      </ul><hr>
+    </div>
+    <div v-else-if="user_select == 2">
+      BMI計算機<br>
+      身高: <input type="text" name="" v-model="t"><br>
+      體重: <input type="text" name="" v-model="w"><br>
+      BMI: {{vw}}<hr>
+    </div>
+    <div v-else-if="user_select == 3">
+      計算機<br>
+      <label>A值: {{user_click}}</label><br>
+      <label>B值: {{user_click2}}</label><br>
+      <label>運算符號: {{user_oper}}</label><br>
+      <label v-show="show">結果 = {{user_total}}</label>
+      <table>
+        <tr>
+          <td>
+            <ul>
+              <li v-for="num in btns" v-on:click="postNum(num)">{{num}}
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li v-for="num in btns" v-on:click="postNum2(num)">{{num}}
+            </ul>          
+          </td>
+          <td>
+            <ul>
+              <li v-for="sign in oper_sign" v-on:click="postSign(sign)">{{sign}}
+            </ul>
+          </td>
+        </tr>
+      </table>
+      <button v-on:click="goCheck()">結果</button>
+    </div>
+    <div v-else="user_select">
+      <span> 尚未選擇</sapn>
+    </div>
+  </div>
+  <script id="jsbin-javascript">
+var app = new Vue({
+  el : "#app",
+  data : {
+    message : "請輸入想要兌換的金額",
+    user_input:0,
+    jpy:0.2422,
+    hkd:3.403,
+    usd:27.285,
+    t:0,
+    w:0,
+    btns:[0,1,2,3,4,5,6,7,8,9],
+    oper_sign: ['+','-','*','/'],
+    user_click : '',
+    user_click2 : '',
+    oper : '',
+    user_oper : '',
+    show : false,
+    user_total : 0
+  },
+  computed : {
+    jpy_cal : function(){
+      return this.user_input / this.jpy
+    },
+    hkd_cal : function(){
+      return this.user_input / this.hkd
+    },
+    usd_cal : function(){
+      return this.user_input / this.usd
+    },
+    vw : function(){
+      return this.w / ((this.t / 100)*(this.t / 100))
+    }
+  },
+  methods:{
+    postNum : function(num){
+      this.user_click += num
+    },
+    postNum2 : function(num){
+      this.user_click2 += num
+    },
+    postSign : function(sign){
+      this.user_oper = sign
+    },
+    goCheck : function(){
+      this.show = true
+      switch(this.user_oper){
+        case '+':
+          this.user_total = this.user_click + this.user_click2
+          break;
+        case '-':
+          this.user_total = this.user_click - this.user_click2
+          break;
+        case '*':
+          this.user_total = this.user_click * this.user_click2
+          break;
+        case '/':
+          this.user_total = this.user_click / this.user_click2
+          break;  
+      }
+    }
+  }
+});
+</script>
+</body>
+</html> 
+    
+    
+    
